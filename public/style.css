@@ -1,0 +1,23 @@
+body {
+  width: 100%; }
+
+.panel {
+  display: inline-block;
+  height: 100vh;
+  vertical-align: top;
+  width: 50%; }
+
+#workspace {
+  background-color: #EEE; }
+  #workspace .CodeMirror {
+    height: 100%; }
+
+#preview {
+  background-color: #EEE; }
+
+#output {
+  white-space: pre-wrap;
+  margin: 20px;
+  padding: 10px; }
+
+/*# sourceMappingURL=style.css.map */

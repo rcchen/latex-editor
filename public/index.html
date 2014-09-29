@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+    <head>
+        <link rel="stylesheet" href="reset.css" type="text/css" />
+        <link rel="stylesheet" href="lib/codemirror.css" type="text/css" />
+        <link rel="stylesheet" href="style.css" type="text/css" />
+        <script src="lib/codemirror.js"></script>
+        <script src="lib/stex/stex.js"></script>
+        <script src="lib/jquery.js"></script>
+    </head>
+    <body>
+        <div id="container">
+            <div class="panel" id="workspace"></div><!-- Hack for inline divs
+            --><div class="panel" id="preview"></div>
+        </div>
+        <script>
+            var editor = CodeMirror(document.getElementById("workspace"), {
+                autofocus: true,
+                lineNumbers: true,
+                lineWrapping: true,
+                mode: "stex"
+            });
+            // Taken from Underscore.js
+            function debounce(func, wait, immediate) {
+                var timeout;
+                return function() {
+                    var context = this, args = arguments;
+                    var later = function() {
+                        timeout = null;
+                        if (!immediate) func.apply(context, args);
+                    };
+                    var callNow = immediate && !timeout;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                    if (callNow) func.apply(context, args);
+                };
+            };
+            editor.on("change", debounce(function() {
+                $.post("/render", { "data": editor.getValue() }, function(data) {
+                    var preview = document.getElementById("preview");
+                    preview.innerHTML = '';
+                    var response = JSON.parse(data);
+                    if (response["success"]) {
+                        var frame = document.createElement("iframe");
+                        frame.src = "tmp/" + response["url"];
+                        frame.width = "100%";
+                        frame.height = "100%";
+                        preview.appendChild(frame);
+                    } else {
+                        var output = document.createElement("pre");
+                        output.id = "output"
+                        output.innerHTML = response["output"];
+                        preview.appendChild(output);
+                    }
+                    console.log(JSON.parse(data));
+                });
+            }, 250));
+        </script>
+    </body>
+</html>
